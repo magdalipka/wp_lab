@@ -8,7 +8,7 @@ class YMD implements DateFormat {
     this.#fs = fs;
   }
   write(y: string, m: string, d: string) {
-    this.#fs.write(`${y}${m}{d}`);
+    this.#fs.write(`${y}${m}${d}`);
   }
 }
 
@@ -52,4 +52,4 @@ class XMLWriter implements FileWriter {
 
 const ymd = new YMD(new CSVWriter());
 
-ymd.write("");
+ymd.write("2021", "12", "02");
