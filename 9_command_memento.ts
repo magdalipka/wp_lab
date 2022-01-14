@@ -115,13 +115,26 @@ type PictureState = {
   pictureId: string;
 };
 
-interface Memento<T> {
+interface IMemento<T> {
   getState: () => T;
   setState: (arg: T) => void;
 }
 
+class Memento<T> {
+  #state: T;
+
+  setState(arg: T) {
+    this.#state = arg;
+  }
+
+  getState() {
+    return this.#state;
+  }
+}
+
 class Picture {
   #state: PictureState;
+  #history: Array<Memento<PictureState>>;
 
   constructor() {
     this.#state = {
@@ -130,30 +143,43 @@ class Picture {
       baseUrl: "https://avatars.githubusercontent.com/u/",
       pictureId: "0",
     };
-  }
+    const memento = new Memento<PictureState>();
+    memento.setState(this.#state);
 
-  setMemento(memento: Memento<PictureState>) {
-    this.#state = { ...memento.getState() };
-  }
-
-  createMemento(memento: Memento<PictureState>) {
-    memento.setState({ ...this.#state });
+    this.#history = new Array();
+    this.#history.push(memento);
   }
 
   minimize() {
     this.#state.minimized = true;
+    const memento = new Memento<PictureState>();
+    memento.setState(this.#state);
+    this.#history.push(memento);
   }
 
   maximize() {
     this.#state.minimized = false;
+    const memento = new Memento<PictureState>();
+    memento.setState(this.#state);
+    this.#history.push(memento);
   }
 
   refresh() {
     this.#state.pictureId = String(Math.floor(Math.random() * 10_000_000));
+    const memento = new Memento<PictureState>();
+    memento.setState(this.#state);
+    this.#history.push(memento);
   }
 
   changeColor(color: string) {
     this.#state.color = color;
+    const memento = new Memento<PictureState>();
+    memento.setState(this.#state);
+    this.#history.push(memento);
+  }
+
+  undo() {
+    this.#state = this.#history.pop().getState();
   }
 }
 
